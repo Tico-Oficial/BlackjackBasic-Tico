@@ -1,0 +1,147 @@
+PREFIJO: $onInteraction
+
+$nomention
+$onlyIf[$checkContains[$customID;bj-tico]==true;]
+$textSplit[$customID;-]
+$onlyIf[$splitText[4]==$authorID;]
+$jsonParse[$getUserVar[blackjack-tico;$authorID]]
+$if[$checkContains[$customID;bj-tico-inicio-$authorID]==true]
+$textSplit[$json[ac];/]$try$onlyIf[$or[$splitText[7]==$message;$json[ac]==]==true;]$catch$description[❌ Upps, <@$authorID> ya tenes un juego activo $json[ac]]$color[ff0000]$removeAllComponents$stop$endtry
+$setUserVar[blackjack-tico;$getVar[blackjack-tico;$botID];$authorID]
+$jsonParse[$getUserVar[blackjack-tico;$authorID]]
+$jsonSetString[ac;https://discord.com/channels/$guildID/$channelID/$messageID]
+$optOff[
+$var[user-1;$randomText[1;2;3;4;5;6;7;8;9;10]]
+$var[user-2;$randomText[1;2;3;4;5;6;7;8;9;10]]
+$var[bot-1;$randomText[1;2;3;4;5;6;7;8;9;10]]
+$var[bot-2;$randomText[1;2;3;4;5;6;7;8;9;10]]]
+$jsonArray[cartas-user]
+$jsonArray[cartas-bot]
+$jsonArrayAppend[cartas-user;[$replaceText[$replaceText[$checkCondition[$var[user-1]==1];true;A;1];false;$replaceText[$var[user-1];10;$randomText[Q;10;J;K];1];1]$optOff[$randomText[♥️;♣️;♦️;♠️]]\]]
+$jsonArrayAppend[cartas-bot;[$replaceText[$replaceText[$checkCondition[$var[bot-1]==1];true;A;1];false;$replaceText[$var[bot-1];10;$randomText[Q;10;J;K];1];1]$optOff[$randomText[♥️;♣️;♦️;♠️]]\]]
+$jsonSetString[valor-user;$sum[0;$var[user-1]]]
+$jsonSetString[valor-bot;$sum[0;$var[bot-1]]]
+$jsonArrayAppend[cartas-user;[$replaceText[$replaceText[$checkCondition[$var[user-2]==1];true;A;1];false;$replaceText[$var[user-2];10;$randomText[Q;10;J;K];1];1]$optOff[$randomText[♥️;♣️;♦️;♠️]]\]]
+$jsonArrayAppend[cartas-bot;[$replaceText[$replaceText[$checkCondition[$var[bot-2]==1];true;A;1];false;$replaceText[$var[bot-2];10;$randomText[Q;10;J;K];1];1]$optOff[$randomText[♥️;♣️;♦️;♠️]]\]]
+$jsonSetString[valor-user;$sum[$json[valor-user];$var[user-2]]]
+$jsonSetString[valor-bot;$sum[$json[valor-bot];$var[bot-2]]]
+$var[bj-u;$sum[$replaceText[$replaceText[$checkCondition[$var[user-1]==1];true;11;1];false;$var[user-1];1];$replaceText[$replaceText[$checkCondition[$var[user-2]==1];true;11;1];false;$var[user-2];1]]]
+$var[bj-b;$sum[$replaceText[$replaceText[$checkCondition[$var[bot-1]==1];true;11;1];false;$var[bot-1];1];$replaceText[$replaceText[$checkCondition[$var[bot-2]==1];true;11;1];false;$var[bot-2];1]]]
+$jsonSetString[as-bot?;$replaceText[$replaceText[$checkCondition[$var[bot-1]==1];true;Soft 11;1];false;$var[bot-1];1]]
+$if[$var[bj-b]==21]
+$jsonSetString[valor-bot;$var[bj-b]]
+$endif
+$var[v-bot;$replaceText[$replaceText[$checkCondition[$or[$var[bot-1]==1;$var[bot-2]==1]==true];true;Soft $sum[$json[valor-bot];10];1];false;$json[valor-bot];1]]
+$if[$and[$var[bj-u]!=21;$or[$var[user-1]==1;$var[user-2]==1]==true]==true]
+$jsonSetString[as;yes]
+$endif
+$if[$json[as]==yes]
+$if[$sum[$json[valor-user];10]<22]
+$jsonSetString[valor-user;$sum[$json[valor-user];10]]
+$jsonSetString[as?;yes]
+$var[as; Soft ]
+$endif
+$endif
+$textSplit[$customID;-]
+$setUserVar[blackjack-tico;$jsonStringify;$authorID]
+$removeAllComponents
+$if[$and[$var[bj-u]==21;$var[bj-b]==21]==true]
+$var[result;empate]
+$elseif[$and[$var[bj-u]==21;$var[bj-b]<21]==true]
+$var[result;gano]
+$var[m;$multi[$var[m];1.25]]
+$endif
+$elseif[$checkContains[$customID;bj-tico-tomar-$authorID]==true]
+$jsonArrayAppend[cartas-user;[$replaceText[$replaceText[$checkCondition[$randomText[1;2;3;4;5;6;7;8;9;10]==1];true;A;1];false;$replaceText[$randomText[1;2;3;4;5;6;7;8;9;10];10;$randomText[Q;10;J;K];1];1]$randomText[♥️;♣️;♦️;♠️]\]]
+$jsonSetString[valor-user;$sum[$json[valor-user];$randomText[1;2;3;4;5;6;7;8;9;10]]]
+$var[cart;$randomText[1;2;3;4;5;6;7;8;9;10]]
+$editButton[bj-tico-tomar-$authorID-$splitText[5];Tomar;primary;$if[$json[valor-user]==21]yes$elseno$endif;;]
+$editButton[bj-tico-dupli-$authorID-$splitText[5];Duplicar;secondary;yes;;]
+$setUserVar[blackjack-tico;$jsonStringify;$authorID]
+$elseif[$checkContains[$customID;bj-tico-plantarse-$authorID;bj-tico-dupli-$authorID]==true]
+$if[$checkContains[$customID;dupli]==true]
+$jsonParse[$getUserVar[blackjack-tico;$authorID]]
+$jsonArrayAppend[cartas-user;[$replaceText[$replaceText[$checkCondition[$randomText[1;2;3;4;5;6;7;8;9;10]==1];true;A;1];false;$replaceText[$randomText[1;2;3;4;5;6;7;8;9;10];10;$randomText[Q;10;J;K];1];1]$randomText[♥️;♣️;♦️;♠️]\]]
+$jsonSetString[valor-user;$sum[$json[valor-user];$randomText[1;2;3;4;5;6;7;8;9;10]]]
+$endif
+$var[tico;1]
+$if[$json[valor-bot]!=21]
+$eval[$repeatMessage[10;
+$$c[]if[$$c[]json[valor-bot\]<17\]
+$$c[]var[cart\;$$c[]optOff[$$c[]randomText[1\;2\;3\;4\;5\;6\;7\;8\;9\;10\]\]\]
+$$c[]jsonArrayAppend[cartas-bot\;[$$c[]replaceText[$$c[]replaceText[$$c[]checkCondition[$$c[]var[cart\]==1\]\;true\;A\;-1\]\;false\;$$c[]replaceText[$$c[]var[cart\]\;10\;$$c[]randomText[Q\;10\;J\;K\]\;1\]\;1\]$$c[]optOff[$$c[]randomText[♥️\;♣️\;♦️\;♠️\]\])\]
+$$c[]jsonSetString[valor-bot\;$$c[]sum[$$c[]json[valor-bot\]\;$$c[]var[cart\]\]\]
+$$c[]elseif[$$c[]or[$$c[]and[$$c[]json[valor-bot\]>21\;$$c[]json[valor-user\]<22\]==true\;$$c[]and[$$c[]json[valor-user\]>$$c[]json[valor-bot\]\;$$c[]json[valor-user\]<22\]==true\]==true\]
+$$c[]var[result\;gano\]
+$$c[]stop
+$$c[]elseif[$$c[]and[$$c[]json[valor-user\]==$$c[]json[valor-bot\]\;$$c[]and[$$c[]json[valor-user\]<22\;$$c[]json[valor-bot\]<22\]==true\]==true\]
+$$c[]var[result\;empate\]
+$$c[]stop
+$$c[]elseif[$$c[]or[$$c[]json[valor-user\]<$$c[]json[valor-bot\]\;$$c[]json[valor-user\]>21\]==true\]
+$$c[]var[result\;perdio\]
+$$c[]stop
+$$c[]endif
+$$c[]var[tico\;$$c[]sum[$$c[]var[tico\]\;1\]\]
+]]
+$else
+$var[result;perdio]
+$var[bj;yes]
+$endif
+$removeAllComponents
+$var[stop;yes]
+$setUserVar[blackjack-tico;$jsonStringify;$authorID]
+$endif
+$if[$checkContains[$customID;tomar;dupli;plantarse]==true]
+$jsonParse[$getUserVar[blackjack-tico;$authorID]]
+$if[$var[cart]==1]
+$jsonSetString[as;yes]
+$endif
+$if[$json[as]==yes]
+$if[$and[$json[as?]!=yes;$sum[$json[valor-user];10]<22]==true]
+$jsonSetString[valor-user;$sum[$json[valor-user];10]]
+$jsonSetString[as?;yes]
+$var[¿?;yes]
+$elseif[$and[$json[as?]==yes;$json[valor-user]>21]==true]
+$jsonSetString[valor-user;$sub[$json[valor-user];10]]
+$jsonSetString[as?;no]
+$elseif[$and[$json[as?]==yes;$json[valor-user]<22]==true]
+$var[¿?;yes]
+$endif
+$endif
+$var[as;$replaceText[$replaceText[$checkCondition[$var[¿?]==yes];true; Soft;1];false;;1]]
+$setUserVar[blackjack-tico;$jsonStringify;$authorID]
+$if[$json[valor-user]>21]
+$var[result;perdio]
+$var[stop;yes]
+$endif
+$endif
+$title[🃏 | Blackjack]
+$description[$replaceText[$replaceText[$checkCondition[$var[result]==gano];true;**Resultado:** ``¡VICTORIA!``;1];false;$replaceText[$replaceText[$checkCondition[$var[result]==empate];true;**Resultado:** ``¡EMPATE!``;1];false;$replaceText[$replaceText[$checkCondition[$var[result]==perdio];true;**Resultado:** ``¡DERROTA!``;1];false;`Tomar:` Toma otra carta
+`Plantarse:` Plantarse y prueba suerte
+`Duplicar:` Toma una carta, plantate y duplica tu apuesta;1];1];1]]
+
+$addField[$nickname[$authorID] (Tú):;
+
+$jsonJoinArray[cartas-user;   ]
+
+-# **Valor:**$var[as]$replaceText[$replaceText[$checkCondition[$var[bj-u]==21];true; Blackjack;1];false; $json[valor-user];1]]
+
+$addField[$nickname[$botID] (Crupier):;
+
+$replaceText[$replaceText[$checkCondition[$and[$var[bj-u]==21;$or[$var[bot-1]==1;$var[bot-1]==10]==true]==true];true;$jsonJoinArray[cartas-bot;   ];1];false;$replaceText[$replaceText[$checkContains[$customID;inicio;tomar];true;$json[cartas-bot;0]   ¿?;1];false;$replaceText[$jsonJoinArray[cartas-bot;   ];);\];-1];1];1]
+
+-# **Valor:** $replaceText[$replaceText[$checkCondition[$and[$var[bj-u]==21;$var[bj-b]==21]==true];true;Blackjack;1];false;$replaceText[$replaceText[$checkCondition[$and[$var[bj-u]==21;$or[$var[bot-1]==1;$var[bot-1]==10]==true]==true];true;$var[v-bot];1];false;$replaceText[$replaceText[$checkContains[$customID;inicio;tomar];true;$json[as-bot?];1];false;$replaceText[$replaceText[$checkCondition[$var[bj]==yes];true;Blackjack;1];false;$json[valor-bot];1];1];1];1]]
+$footerIcon[$authorAvatar]
+$footer[$username]
+$color[$replaceText[$replaceText[$checkCondition[$var[result]==gano];true;00ff00;1];false;$replaceText[$replaceText[$checkCondition[$var[result]==empate];true;ff9000;1];false;$replaceText[$replaceText[$checkCondition[$var[result]==perdio];true;ff0000;1];false;6e00ff;1];1];1]]
+$if[$var[bj-u]==21]
+$resetUserVar[blackjack-tico;$authorID]
+$elseif[$checkContains[$customID;inicio]==true]
+$addButton[no;bj-tico-tomar-$authorID-$splitText[5];Tomar;primary;no;;]
+$addButton[no;bj-tico-plantarse-$authorID-$splitText[5];Plantarse;success;no;;]
+$addButton[no;bj-tico-dupli-$authorID-$splitText[5];Duplicar;secondary;no;;]
+$endif
+$if[$var[stop]==yes]
+$removeAllComponents
+$resetUserVar[blackjack-tico;$authorID]
+$endif
