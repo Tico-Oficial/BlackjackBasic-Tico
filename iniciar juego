@@ -1,0 +1,21 @@
+PREFIJO: Cualquiera
+
+$nomention
+$jsonParse[$getVar[blackjack-tico;$botID]]
+$if[$checkContains[$toLowercase[$message[1]];bj;blackjack]==true]
+$jsonParse[$getUserVar[blackjack-tico;$authorID]]
+$textSplit[$json[ac];/]
+$try
+$onlyIf[$or[$splitText[7]==$message;$json[ac]==]==true;]
+$catch
+$description[❌ Upps, <@$authorID> ya tenes un juego activo $json[ac]]
+$color[ff0000]
+$stop
+$endtry
+$suppressErrors[❌ La variable configurada no almacena números]
+$title[🃏 | Blackjack]
+$description[<@$authorID> Estas apunto de jugar al blackjack.
+Inicia la partida cuando estes listo]
+$color[6e00ff]
+$addButton[no;bj-tico-inicio-$authorID-$message[2];Iniciar;primary;no;;]
+$endif
