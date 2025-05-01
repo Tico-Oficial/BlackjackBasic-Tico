@@ -1,1 +1,1 @@
-# BlackjackBasic-Tico
+# Blackjack Basic-Tico
